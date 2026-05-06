@@ -1,0 +1,85 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: scheduler
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d scheduler"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  migrate:
+    image: postgres:16
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: postgres
+    volumes:
+      - ./drizzle:/migrations
+    command: >
+      sh -c "psql -h postgres -U postgres -d scheduler -f /migrations/0000_init.sql"
+
+  gateway:
+    build:
+      context: .
+      dockerfile: services/gateway/Dockerfile
+    environment:
+      PORT: 3000
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/scheduler
+      QUEUE_NAME: ml-tasks
+    depends_on:
+      - redis
+      - postgres
+      - migrate
+    ports:
+      - "3000:3000"
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: services/scheduler/Dockerfile
+    environment:
+      PORT: 3001
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/scheduler
+      QUEUE_NAME: ml-tasks
+      WORKER_HEARTBEAT_INTERVAL_MS: 5000
+      WORKER_HEARTBEAT_TTL_MS: 15000
+    depends_on:
+      - redis
+      - postgres
+      - migrate
+    ports:
+      - "3001:3001"
+
+  worker:
+    build:
+      context: .
+      dockerfile: services/worker/Dockerfile
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/scheduler
+      QUEUE_NAME: ml-tasks
+      WORKER_HEARTBEAT_INTERVAL_MS: 5000
+      WORKER_HEARTBEAT_TTL_MS: 15000
+      BULLMQ_LOCK_DURATION_MS: 30000
+      TASK_EXECUTION_TIMEOUT_MS: 45000
+    depends_on:
+      - redis
+      - postgres
+      - migrate

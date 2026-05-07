@@ -19,7 +19,6 @@ Distributed machine-learning task scheduler built with Bun, Hono, BullMQ/Redis, 
    - `bun scripts/smoke-test.ts`
 
 ## API
-
 - `POST /tasks`
 - `GET /tasks/:id`
 - `GET /tasks/:id/result`

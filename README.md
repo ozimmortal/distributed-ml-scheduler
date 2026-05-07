@@ -40,6 +40,5 @@ Distributed machine-learning task scheduler built with Bun, Hono, BullMQ/Redis, 
    - `GET http://localhost:3001/events`
 
 ## Notes
-
 - Consistency model is eventual consistency between queue lifecycle and DB state.
 - Task lifecycle events are written into `task_events` for observability and auditing.

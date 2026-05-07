@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 import { db, taskEvents, tasks, workers } from "@scheduler/shared";
 import type { SubmitTaskInput } from "@scheduler/shared";
 import { TASK_STATUS } from "@scheduler/shared";
@@ -32,3 +32,7 @@ export const getTaskById = async (id: string) => {
 };
 
 export const listWorkers = async () => db.select().from(workers);
+
+export const listTasks = async (limit = 20) => {
+  return db.select().from(tasks).orderBy(desc(tasks.createdAt)).limit(limit);
+};

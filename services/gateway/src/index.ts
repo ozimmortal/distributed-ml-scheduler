@@ -1,9 +1,12 @@
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { submitTaskSchema } from "@scheduler/shared";
 import { taskQueue } from "./queue/redis";
-import { createTaskRecord, getTaskById, listWorkers } from "./lib/tasks";
+import { createTaskRecord, getTaskById, listWorkers, listTasks } from "./lib/tasks";
 
 const app = new Hono();
+
+app.use("*", cors());
 
 app.get("/", (c) => c.json({ service: "gateway", status: "ok" }));
 app.get("/health", (c) => c.json({ service: "gateway", status: "ok" }));
@@ -23,6 +26,11 @@ app.post("/tasks", async (c) => {
   );
 
   return c.json({ taskId: task.id, status: task.status }, 202);
+});
+
+app.get("/tasks", async (c) => {
+  const limit = Number(c.req.query("limit") ?? 20);
+  return c.json(await listTasks(limit));
 });
 
 app.get("/tasks/:id", async (c) => {

@@ -83,3 +83,16 @@ services:
       - redis
       - postgres
       - migrate
+
+  frontend:
+    build:
+      context: .
+      dockerfile: services/frontend/Dockerfile
+    environment:
+      NEXT_PUBLIC_GATEWAY_URL: http://localhost:3000
+      NEXT_PUBLIC_SCHEDULER_URL: http://localhost:3001
+    ports:
+      - "5000:3000"
+    depends_on:
+      - gateway
+      - scheduler

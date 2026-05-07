@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { lt } from "drizzle-orm";
 import {
   appConfig,
@@ -11,6 +12,7 @@ import {
 } from "@scheduler/shared";
 
 const app = new Hono();
+app.use("*", cors());
 const queueEvents = createQueueEvents();
 const taskQueue = createTaskQueue();
 

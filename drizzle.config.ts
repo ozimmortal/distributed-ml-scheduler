@@ -5,6 +5,6 @@ export default defineConfig({
   schema: "./packages/shared/src/lib/schema.ts",
   dialect: "postgresql",
   dbCredentials: {
-    url: process.env.DATABASE_URL ?? "postgres://postgres:postgres@localhost:5432/scheduler",
+    url: process.env.DATABASE_URL ?? "postgres://postgres:postgres@localhost:5433/scheduler",
   },
 });

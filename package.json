@@ -9,10 +9,13 @@
     "dev:gateway": "bun run --cwd services/gateway dev",
     "dev:worker": "bun run --cwd services/worker dev",
     "dev:scheduler": "bun run --cwd services/scheduler dev",
+    "dev:frontend": "bun run --cwd services/frontend dev",
+    "dev:all": "concurrently \"bun run dev:gateway\" \"bun run dev:worker\" \"bun run dev:scheduler\" \"bun run dev:frontend\"",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:push": "drizzle-kit push"
   },
   "devDependencies": {
+    "concurrently": "^9.2.1",
     "drizzle-kit": "^0.31.5"
   }
 }

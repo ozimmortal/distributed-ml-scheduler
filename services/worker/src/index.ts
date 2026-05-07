@@ -139,6 +139,6 @@ const app = new Hono();
 app.get("/health", (c) => c.json({ service: "worker", status: "ok", workerId }));
 
 export default {
-  port: Number(process.env.PORT ?? 4000),
+  port: Number(process.env.PORT ?? 4005),
   fetch: app.fetch,
 };
